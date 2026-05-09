@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clairly - Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #ff1744 0%, #ff6b9d 25%, #ffa6c9 50%, #ff4569 75%, #d32f2f 100%);
+            filter: blur(60px);
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+                transform: scale(1);
+            }
+            50% {
+                background-position: 100% 50%;
+                transform: scale(1.1);
+            }
+            100% {
+                background-position: 0% 50%;
+                transform: scale(1);
+            }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.15), transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(255, 182, 193, 0.2), transparent 50%);
+            z-index: -1;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 40px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 12px 25px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-weight: 600;
+            font-size: 18px;
+            color: rgba(0, 0, 0, 0.7);
+            letter-spacing: -0.5px;
+        }
+
+        .nav-container a {
+            text-decoration: none;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-container a:hover {
+            color: rgba(0, 0, 0, 0.9);
+        }
+
+        .chat-container {
+            max-width: 900px;
+            margin: 100px auto 0;
+            height: calc(100vh - 120px);
+            display: flex;
+            flex-direction: column;
+            padding: 0 20px 20px;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.7);
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 16px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            color: rgba(0, 0, 0, 0.8);
+            max-width: 70%;
+            line-height: 1.6;
+        }
+
+        .message.user .message-content {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .message.assistant .message-content {
+            background: #007AFF;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .input-container {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 16px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 12px;
+        }
+
+        .disclaimer {
+            text-align: center;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+            font-weight: 400;
+        }
+
+        #messageInput {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: rgba(0, 0, 0, 0.8);
+            font-size: 15px;
+            font-family: inherit;
+            padding: 8px;
+        }
+
+        #messageInput::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        #sendButton {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(0, 0, 0, 0.7);
+            font-size: 20px;
+        }
+
+        #sendButton:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        #sendButton:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .welcome-message {
+            display: none;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 8px;
+            padding: 16px 20px;
+            font-size: 20px;
+        }
+
+        .typing-emoji {
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-emoji:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-emoji:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                margin-top: 80px;
+                height: calc(100vh - 100px);
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            nav {
+                padding: 15px 20px;
+            }
+
+            .nav-container {
+                padding: 10px 20px;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    <div class="overlay"></div>
+
+    <nav>
+        <div class="nav-container">
+            <span class="logo" onclick="window.location.href='clairly_landing.html'" style="cursor: pointer;">clairly</span>
+            <a href="clairly_landing.html">home</a>
+            <a href="clairly_about.html">about</a>
+            <a href="clairly_chat.html">chat</a>
+            <a href="clairly_signin.html">sign in</a>
+        </div>
+    </nav>
+
+    <div class="chat-container">
+        <div class="messages" id="messages"></div>
+
+        <div class="input-container">
+            <input 
+                type="text" 
+                id="messageInput" 
+                placeholder="Ask me anything..."
+                autocomplete="off"
+            >
+            <button id="sendButton" disabled>
+                ➤
+            </button>
+        </div>
+
+        <div class="disclaimer">
+            clairly might make mistakes, please review messages for misinformation.
+        </div>
+    </div>
+
+    <script>
+        const messagesDiv = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+
+        messageInput.addEventListener('input', () => {
+            sendButton.disabled = messageInput.value.trim() === '';
+        });
+
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !sendButton.disabled) {
+                sendMessage();
+            }
+        });
+
+        sendButton.addEventListener('click', sendMessage);
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            addMessage(message, 'user');
+            messageInput.value = '';
+            sendButton.disabled = true;
+
+            const typingId = addTypingIndicator();
+
+            try {
+                const response = await fetch('/api_proxy', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 1000,
+                        system: "You are Clairly, a helpful AI assistant built for students at Montclair State University in New Jersey. You are Friendly, encouraging, and specialize ONLY in topics related to the University. Do not respond to questions talking about politics, current events unrelated to the University. You do not condone Racism, and Abuse of any kind. You are ONLY built for student purpose for every and all things Montclair State University. If someone mentions what or who are you YOU ONLY RESPOND TO CLAIRLY. YOU ARE NOT CLAUDE.",
+                        messages: [
+                            { 
+                                role: 'user', 
+                                content: message 
+                            }
+                        ]
+                    })
+                });
+
+                const data = await response.json();
+                
+                removeTypingIndicator(typingId);
+
+                if (data.content && data.content[0]) {
+                    addMessage(data.content[0].text, 'assistant');
+                } else {
+                    addMessage('Sorry, I encountered an error. Please try again.', 'assistant');
+                }
+            } catch (error) {
+                removeTypingIndicator(typingId);
+                addMessage('Sorry, I encountered an error connecting to the AI. Please try again.', 'assistant');
+                console.error('Error:', error);
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = sender === 'user' ? 'U' : 'C';
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.textContent = text;
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+            messagesDiv.appendChild(messageDiv);
+            
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function addTypingIndicator() {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message assistant';
+            messageDiv.id = 'typing-indicator';
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = 'C';
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.innerHTML = '<span class="typing-emoji">🦅</span><span class="typing-emoji">🔴</span><span class="typing-emoji">🤖</span>';
+            
+            content.appendChild(typingDiv);
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+            messagesDiv.appendChild(messageDiv);
+            
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            return 'typing-indicator';
+        }
+
+        function removeTypingIndicator(id) {
+            const indicator = document.getElementById(id);
+            if (indicator) indicator.remove();
+        }
+    </script>
+</body>
+</html>

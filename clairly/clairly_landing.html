@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clairly - AI Built by Students, For Students</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @import url('https://fonts.cdnfonts.com/css/quil-display');
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            overflow-x: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #ff1744 0%, #ff6b9d 25%, #ffa6c9 50%, #ff4569 75%, #d32f2f 100%);
+            filter: blur(60px);
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+                transform: scale(1);
+            }
+            50% {
+                background-position: 100% 50%;
+                transform: scale(1.1);
+            }
+            100% {
+                background-position: 0% 50%;
+                transform: scale(1);
+            }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.15), transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(255, 182, 193, 0.2), transparent 50%);
+            z-index: -1;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 40px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 12px 25px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-weight: 600;
+            font-size: 18px;
+            color: rgba(0, 0, 0, 0.7);
+            letter-spacing: -0.5px;
+        }
+
+        .nav-container a {
+            text-decoration: none;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-container a:hover {
+            color: rgba(0, 0, 0, 0.9);
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .intro-text {
+            font-family: 'Quil Display', serif;
+            font-size: 18px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            text-transform: lowercase;
+        }
+
+        .main-title {
+            width: clamp(400px, 60vw, 900px);
+            height: auto;
+            margin-bottom: 30px;
+        }
+
+        .main-title img {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: brightness(0) invert(1);
+        }
+
+        .subtitle {
+            font-family: 'Quil Display', serif;
+            font-size: clamp(18px, 3vw, 28px);
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .description {
+            font-family: 'Quil Display', serif;
+            font-size: clamp(16px, 2.5vw, 24px);
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 50px;
+            letter-spacing: 0.5px;
+        }
+
+        .cta-button {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 16px 45px;
+            border-radius: 50px;
+            text-decoration: none;
+            color: rgba(0, 0, 0, 0.8);
+            font-size: 16px;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .nav-container {
+                padding: 10px 20px;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    <div class="overlay"></div>
+
+    <nav>
+        <div class="nav-container">
+            <span class="logo" onclick="window.location.href='clairly_landing.html'" style="cursor: pointer;">clairly</span>
+            <a href="clairly_landing.html">home</a>
+            <a href="clairly_about.html">about</a>
+            <a href="clairly_chat.html">chat</a>
+            <a href="clairly_signin.html">sign in</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="intro-text">introducing</div>
+        <h1 class="main-title">CLAIRLY</h1>
+        <div class="subtitle">clearly montclair.</div>
+        <div class="subtitle">clearly helpful.</div>
+        <div class="description">ai built by students, for students.</div>
+        <a href="clairly_chat.html" class="cta-button">chat now.</a>
+    </div>
+</body>
+</html>
